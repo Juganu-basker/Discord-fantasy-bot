@@ -20,17 +20,27 @@ intents.message_content = True
 intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+# Configure logging to output to console
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(handler)
+
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}')
+    logger.info(f'Logged in as {bot.user}')
 
 @bot.event
 async def on_member_join(member):
-    print(f'{member} has joined the server')
+    logger.info(f'{member} has joined the server')
     
 @bot.event
 async def on_member_remove(member):
-    print(f'{member} has left the server')
+    logger.info(f'{member} has left the server')
 
 @bot.event
 async def on_message(message):
@@ -69,15 +79,11 @@ async def playerStats(ctx, player_name):
     
 
 def run_bot():
-    # Configure logging to output to console
-    handler = logging.StreamHandler()
-    handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
+    logger.info("Starting up the bot")
+    try:
+        bot.run(token=TOKEN, log_level=logging.DEBUG)
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
 
-    logger = logging.getLogger('discord')
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(handler)
-
-    bot.run(token=TOKEN, log_level=logging.DEBUG)
-
+if __name__ == "__main__":
+    run_bot()
